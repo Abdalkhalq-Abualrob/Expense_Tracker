@@ -1,10 +1,15 @@
+const token = localStorage.getItem("token");
+if (!token) {
+  window.location.replace("login.html");
+}
+
 const API_URL = "http://localhost:3000/api/expenses";
 
 let allExpenses = [];
 let expenseChartInstance = null;
 let alertTimeout = null;
 
-//Dom elements
+// Dom elements
 const themeToggleBtn = document.getElementById("theme-toggle");
 const expenseForm = document.getElementById("expense-form");
 const titleInput = document.getElementById("title");
@@ -12,7 +17,7 @@ const amountInput = document.getElementById("amount");
 const categorySelect = document.getElementById("category");
 const dateInput = document.getElementById("date");
 
-//Elements for filter,table,stats,loading,alert
+// Elements for filter, table, stats, loading, alert
 const filterCategory = document.getElementById("filter-category");
 const expensesTableBody = document.getElementById("expenses-table-body");
 const totalAmountElem = document.getElementById("total-amount");
@@ -21,7 +26,7 @@ const highestExpenseElem = document.getElementById("highest-expense");
 const spinner = document.getElementById("loading-spinner");
 const alertBox = document.getElementById("alert-box");
 
-//Modale elements
+// Modal elements
 const editModalElement = document.getElementById("editModal");
 const editModal = new bootstrap.Modal(editModalElement);
 const editForm = document.getElementById("edit-form");
@@ -30,6 +35,44 @@ const editTitleInput = document.getElementById("edit-title");
 const editAmountInput = document.getElementById("edit-amount");
 const editCategorySelect = document.getElementById("edit-category");
 const editDateInput = document.getElementById("edit-date");
+
+function getAuthHeaders() {
+  const currentToken = localStorage.getItem("token");
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${currentToken}`,
+  };
+}
+
+function handleUnauthorized() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.location.replace("login.html");
+}
+
+function setupUserSessionUI() {
+  const userJson = localStorage.getItem("user");
+  if (userJson) {
+    try {
+      const user = JSON.parse(userJson);
+      const userDisplayElem = document.getElementById("user-display-name");
+      if (userDisplayElem) {
+        userDisplayElem.textContent = user.full_name || user.email;
+      }
+    } catch (e) {
+      console.error("Error parsing user data:", e);
+    }
+  }
+
+  const logoutBtn = document.getElementById("logout-btn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.replace("login.html");
+    });
+  }
+}
 
 function initTheme() {
   const savedTheme = localStorage.getItem("app_theme") || "light";
@@ -217,7 +260,15 @@ async function fetchExpenses() {
   alertBox.classList.add("d-none");
 
   try {
-    const response = await fetch(API_URL);
+    const response = await fetch(API_URL, {
+      headers: getAuthHeaders(),
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      handleUnauthorized();
+      return;
+    }
+
     if (!response.ok) {
       throw new Error(`Server responded with status: ${response.status}`);
     }
@@ -248,9 +299,14 @@ async function addExpense(expenseData) {
   try {
     const response = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify(expenseData),
     });
+
+    if (response.status === 401 || response.status === 403) {
+      handleUnauthorized();
+      return;
+    }
 
     if (!response.ok) {
       const err = await response.json();
@@ -273,9 +329,14 @@ async function updateExpense(id, updatedData) {
   try {
     const response = await fetch(`${API_URL}/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify(updatedData),
     });
+
+    if (response.status === 401 || response.status === 403) {
+      handleUnauthorized();
+      return;
+    }
 
     if (!response.ok) {
       const err = await response.json();
@@ -297,7 +358,15 @@ async function deleteExpense(id) {
   try {
     const response = await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     });
+
+    if (response.status === 401 || response.status === 403) {
+      handleUnauthorized();
+      return;
+    }
 
     if (!response.ok) {
       const err = await response.json();
@@ -354,6 +423,7 @@ editForm.addEventListener("submit", async (e) => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+  setupUserSessionUI();
   initTheme();
   setDefaultDate();
   fetchExpenses();

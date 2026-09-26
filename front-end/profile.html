@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile - Expense Tracker</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-body-tertiary">
+    <nav class="navbar navbar-dark bg-dark mb-4 shadow-sm">
+      <div class="container d-flex justify-content-between align-items-center">
+        <a href="index.html" class="navbar-brand mb-0 h1 text-decoration-none"
+          >← Dashboard</a
+        >
+        <button id="logout-btn" class="btn btn-outline-danger btn-sm">
+          Logout
+        </button>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-9 col-lg-7">
+          <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4 p-sm-5">
+              <h3 class="fw-bold text-primary mb-4">Account Settings</h3>
+
+              <div
+                id="profile-alert"
+                class="alert alert-danger d-none py-2"
+                role="alert"
+              ></div>
+
+              <div id="profile-loading" class="text-center my-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+
+              <div id="profile-content" class="d-none">
+                <!--quick stats -->
+                <div class="row g-3 mb-4">
+                  <div class="col-6">
+                    <div class="p-3 bg-light rounded-3 text-center border">
+                      <div class="text-muted small">Total Recorded</div>
+                      <div class="fs-4 fw-bold text-primary" id="profile-count">
+                        0
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="p-3 bg-light rounded-3 text-center border">
+                      <div class="text-muted small">Total Spent</div>
+                      <div class="fs-4 fw-bold text-success" id="profile-spent">
+                        $0.00
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- form for edit profile -->
+                <form id="edit-profile-form" novalidate>
+                  <div class="mb-3">
+                    <label for="edit-name" class="form-label fw-semibold"
+                      >Full Name</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="edit-name"
+                      required
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="edit-email" class="form-label fw-semibold"
+                      >Email Address</label
+                    >
+                    <input
+                      type="email"
+                      class="form-control"
+                      id="edit-email"
+                      required
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold text-muted"
+                      >Member Since</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control bg-light"
+                      id="profile-date"
+                      disabled
+                    />
+                  </div>
+
+                  <hr class="my-4" />
+                  <h6 class="fw-bold text-danger mb-3">
+                    Change Password (Optional)
+                  </h6>
+
+                  <div class="mb-3">
+                    <label for="current-password" class="form-label fw-semibold"
+                      >Current Password</label
+                    >
+                    <input
+                      type="password"
+                      class="form-control"
+                      id="current-password"
+                      placeholder="Required only if changing password"
+                    />
+                  </div>
+
+                  <div class="mb-4">
+                    <label for="new-password" class="form-label fw-semibold"
+                      >New Password</label
+                    >
+                    <input
+                      type="password"
+                      class="form-control"
+                      id="new-password"
+                      placeholder="Leave empty to keep current"
+                    />
+                  </div>
+
+                  <div class="d-flex gap-2">
+                    <button
+                      type="submit"
+                      id="save-profile-btn"
+                      class="btn btn-primary px-4 fw-semibold"
+                    >
+                      Save Changes
+                    </button>
+                    <a href="index.html" class="btn btn-outline-secondary px-3"
+                      >Cancel</a
+                    >
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./js/profile.js"></script>
+  </body>
+</html>
